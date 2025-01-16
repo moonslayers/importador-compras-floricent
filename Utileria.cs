@@ -8,7 +8,8 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.IO;
 using System.Configuration;
-
+using System.Windows.Forms;
+using Org.BouncyCastle.Math.EC.Multiplier;
 
 namespace ImportadorRemisiones
 {
@@ -167,28 +168,21 @@ namespace ImportadorRemisiones
                 }
             }
         }
-        public async Task<DataTable> getProductos(string idOrden, string idCliente)
+        public async Task<DataTable> getProductos(string idOrden, string codigo_cliente, int documento_id, int moneda)
         {
-            string apiUrl = string.Format(ConfigurationManager.AppSettings["APINODE"]) + "data/productos-cliente";
+            string apiUrl = string.Format(ConfigurationManager.AppSettings["APINODE"]) + "data/productos-cliente?oid="+idOrden.ToString()+"&did="+documento_id.ToString()+"&moneda="+moneda.ToString()+"&aproveedor="+codigo_cliente;
 
 
             using (HttpClient client = new HttpClient())
             {
-                var postData = new { 
-                    cidcliente = idCliente,
-                    idorden= idOrden,
-                };
-                var jsonContent = new StringContent(JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json");
                 // Realizar una solicitud GET al API
-                HttpResponseMessage response = await client.PostAsync(apiUrl, jsonContent);
+                HttpResponseMessage response = await client.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
                 {
                     // Leer el contenido de la respuesta
                     string apiResponse = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine(apiResponse);
-                    Console.WriteLine("idCliente:",idCliente);
-                    Console.WriteLine("idOrden:", idOrden);
+                    //MessageBox.Show("PRODUCTOS:" + apiResponse);
                     DataTable dataTable = new DataTable();
                     dataTable = JsonConvert.DeserializeObject<DataTable>(apiResponse);
 
@@ -199,6 +193,36 @@ namespace ImportadorRemisiones
                     // Manejar el caso en que la solicitud al API no sea exitosa
                     Console.WriteLine("Error en la solicitud al API. Código de estado: " + response.StatusCode);
                     return null;
+                }
+            }
+        }
+
+        public async Task marcarProductoImportado(string json)
+        {
+            string apiUrl = string.Format(ConfigurationManager.AppSettings["APINODE"]) + "data/importar-productos";
+
+
+            using (HttpClient client = new HttpClient())
+            {
+                var postData = new
+                {
+                    productosid = json,
+                };
+                var jsonContent = new StringContent(JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json");
+                // Realizar una solicitud GET al API
+                HttpResponseMessage response = await client.PostAsync(apiUrl, jsonContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Leer el contenido de la respuesta
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine(apiResponse);
+                    Console.WriteLine("jsonList:", json);
+                }
+                else
+                {
+                    // Manejar el caso en que la solicitud al API no sea exitosa
+                    Console.WriteLine("Error en la solicitud al API. Código de estado: " + response.StatusCode);
                 }
             }
         }
@@ -256,6 +280,93 @@ namespace ImportadorRemisiones
                 }
             }
             return "";
+        }
+
+        //funcion para obtener el tipo de cambio
+        public static async Task<decimal> ObtenerTipoCambio()
+        {
+            string url = "https://latest.currency-api.pages.dev/v1/currencies/usd.json";
+
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    // Realiza la solicitud HTTP.
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode(); // Lanza excepción si la solicitud falla.
+
+                    // Obtiene el contenido como string.
+                    string json = await response.Content.ReadAsStringAsync();
+
+                    // Deserializa el JSON para extraer el tipo de cambio.
+                    var jsonData = JsonConvert.DeserializeObject<RootResponse>(json);
+                    if (jsonData != null && jsonData.usd?.mxn != null)
+                    {
+                        return jsonData.usd.mxn.Value; // Retorna el tipo de cambio.
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show($"Error al inicializar el tipo de cambio: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // En caso de error, retorna un valor predeterminado.
+                return 20m;
+            }
+
+            // Valor predeterminado si no se pudo obtener el tipo de cambio.
+            return 20m;
+        }
+
+        // Clase interna para mapear la estructura JSON.
+        private class RootResponse
+        {
+            public UsdData usd { get; set; }
+        }
+
+        private class UsdData
+        {
+            public decimal? mxn { get; set; }
+        }
+
+        /// <summary>
+        /// Obtiene una lista de facturas desde una API.
+        /// </summary>
+        /// <param name="url">La URL de la API.</param>
+        /// <returns>Una lista de objetos Factura.</returns>
+        public async Task<List<Factura>> GetFacturasFromApiAsyncByOrden(int oid)
+        {
+            try
+            {
+                string url = string.Format(ConfigurationManager.AppSettings["APINODE"]) + "data/ordenes-compra/documentos?oid=" + oid.ToString();
+                using (HttpClient client = new HttpClient())
+                {
+                    // Realiza la solicitud HTTP
+                    HttpResponseMessage response = await client.GetAsync(url);
+
+                    // Verifica si la respuesta fue exitosa
+                    response.EnsureSuccessStatusCode();
+
+                    // Lee el contenido de la respuesta como cadena
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+
+                    // Deserializa el JSON a una lista de objetos 
+                    return JsonConvert.DeserializeObject<List<Factura>>(jsonResponse) ?? new List<Factura>();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener o procesar las facturas: {ex.Message}");
+                return new List<Factura>(); // Retorna una lista vacía en caso de error
+            }
+        }
+
+        public class Factura
+        {
+            public int factura_codigo { get; set; }
+            public int moneda_codigo { get; set; }
+            public string codigo_cliente { get; set; }
+            public int documento_id { get; set; }
         }
     }
 }

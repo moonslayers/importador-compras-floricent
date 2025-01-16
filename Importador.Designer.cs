@@ -30,26 +30,24 @@ namespace ImportadorRemisiones
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Importador));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnVerRemisiones = new System.Windows.Forms.Button();
             this.btnImportarContpaqi = new System.Windows.Forms.Button();
             this.dgvRemisiones = new System.Windows.Forms.DataGridView();
-            this.FechaCreacion = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.txtTipoCambio = new System.Windows.Forms.TextBox();
-            this.cmbTipoFactura = new System.Windows.Forms.ComboBox();
-            this.cmbTipoPago = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.toolStripMain = new System.Windows.Forms.ToolStrip();
-            this.tsBtnTipoCambio = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.button1 = new System.Windows.Forms.Button();
             this.Folio = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.nocliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.RID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.aproveedor = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FechaCreacion = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.txtTipoCambio = new System.Windows.Forms.TextBox();
+            this.cmbTipoPago = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.toolStripMain = new System.Windows.Forms.ToolStrip();
+            this.tsBtnTipoCambio = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvRemisiones)).BeginInit();
             this.toolStripMain.SuspendLayout();
             this.SuspendLayout();
@@ -103,6 +101,44 @@ namespace ImportadorRemisiones
             this.dgvRemisiones.Size = new System.Drawing.Size(776, 417);
             this.dgvRemisiones.TabIndex = 2;
             // 
+            // Folio
+            // 
+            this.Folio.DataPropertyName = "oid";
+            this.Folio.HeaderText = "Programa";
+            this.Folio.MinimumWidth = 10;
+            this.Folio.Name = "Folio";
+            this.Folio.ReadOnly = true;
+            // 
+            // nocliente
+            // 
+            this.nocliente.DataPropertyName = "ofechaorden";
+            this.nocliente.HeaderText = "Fecha orden";
+            this.nocliente.MinimumWidth = 10;
+            this.nocliente.Name = "nocliente";
+            this.nocliente.ReadOnly = true;
+            this.nocliente.Width = 150;
+            // 
+            // RID
+            // 
+            this.RID.DataPropertyName = "rid";
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.RID.DefaultCellStyle = dataGridViewCellStyle2;
+            this.RID.HeaderText = "RID";
+            this.RID.MinimumWidth = 10;
+            this.RID.Name = "RID";
+            this.RID.ReadOnly = true;
+            this.RID.Visible = false;
+            this.RID.Width = 50;
+            // 
+            // aproveedor
+            // 
+            this.aproveedor.DataPropertyName = "aproveedor";
+            this.aproveedor.HeaderText = "Proveedor";
+            this.aproveedor.MinimumWidth = 10;
+            this.aproveedor.Name = "aproveedor";
+            this.aproveedor.ReadOnly = true;
+            this.aproveedor.Width = 200;
+            // 
             // FechaCreacion
             // 
             this.FechaCreacion.DataPropertyName = "ofechacreacion";
@@ -120,17 +156,8 @@ namespace ImportadorRemisiones
             this.txtTipoCambio.Name = "txtTipoCambio";
             this.txtTipoCambio.Size = new System.Drawing.Size(100, 20);
             this.txtTipoCambio.TabIndex = 3;
-            this.txtTipoCambio.Text = "1";
+            this.txtTipoCambio.Text = "20";
             this.txtTipoCambio.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtTipoCambio.TextChanged += new System.EventHandler(this.txtTipoCambio_TextChanged);
-            // 
-            // cmbTipoFactura
-            // 
-            this.cmbTipoFactura.FormattingEnabled = true;
-            this.cmbTipoFactura.Location = new System.Drawing.Point(404, 60);
-            this.cmbTipoFactura.Name = "cmbTipoFactura";
-            this.cmbTipoFactura.Size = new System.Drawing.Size(244, 21);
-            this.cmbTipoFactura.TabIndex = 4;
             // 
             // cmbTipoPago
             // 
@@ -147,15 +174,6 @@ namespace ImportadorRemisiones
             this.label1.Size = new System.Drawing.Size(69, 13);
             this.label1.TabIndex = 5;
             this.label1.Text = "Tipo Cambio:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(404, 40);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(70, 13);
-            this.label2.TabIndex = 6;
-            this.label2.Text = "Tipo Factura:";
             // 
             // toolStripMain
             // 
@@ -194,45 +212,6 @@ namespace ImportadorRemisiones
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.select_all);
             // 
-            // Folio
-            // 
-            this.Folio.DataPropertyName = "oid";
-            this.Folio.HeaderText = "Folio";
-            this.Folio.MinimumWidth = 10;
-            this.Folio.Name = "Folio";
-            this.Folio.ReadOnly = true;
-            this.Folio.Width = 50;
-            // 
-            // nocliente
-            // 
-            this.nocliente.DataPropertyName = "ofechaorden";
-            this.nocliente.HeaderText = "Fecha orden";
-            this.nocliente.MinimumWidth = 10;
-            this.nocliente.Name = "nocliente";
-            this.nocliente.ReadOnly = true;
-            this.nocliente.Width = 150;
-            // 
-            // RID
-            // 
-            this.RID.DataPropertyName = "rid";
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.RID.DefaultCellStyle = dataGridViewCellStyle2;
-            this.RID.HeaderText = "RID";
-            this.RID.MinimumWidth = 10;
-            this.RID.Name = "RID";
-            this.RID.ReadOnly = true;
-            this.RID.Visible = false;
-            this.RID.Width = 50;
-            // 
-            // aproveedor
-            // 
-            this.aproveedor.DataPropertyName = "aproveedor";
-            this.aproveedor.HeaderText = "Proveedor";
-            this.aproveedor.MinimumWidth = 10;
-            this.aproveedor.Name = "aproveedor";
-            this.aproveedor.ReadOnly = true;
-            this.aproveedor.Width = 200;
-            // 
             // Importador
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -240,9 +219,7 @@ namespace ImportadorRemisiones
             this.ClientSize = new System.Drawing.Size(800, 530);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.toolStripMain);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.cmbTipoFactura);
             this.Controls.Add(this.txtTipoCambio);
             this.Controls.Add(this.dgvRemisiones);
             this.Controls.Add(this.btnImportarContpaqi);
@@ -266,10 +243,8 @@ namespace ImportadorRemisiones
         private System.Windows.Forms.Button btnImportarContpaqi;
         private System.Windows.Forms.DataGridView dgvRemisiones;
         private System.Windows.Forms.TextBox txtTipoCambio;
-        private System.Windows.Forms.ComboBox cmbTipoFactura;
         private System.Windows.Forms.ComboBox cmbTipoPago;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.DataGridViewTextBoxColumn ID;
         private System.Windows.Forms.DataGridViewTextBoxColumn idcliente;
         private System.Windows.Forms.DataGridViewTextBoxColumn FechaCreacion;
