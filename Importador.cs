@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.IO;
+using System.Dynamic;
 
 namespace ImportadorRemisiones
 {
@@ -94,6 +95,13 @@ namespace ImportadorRemisiones
 
                         foreach (var documentoRest in documentos)
                         {
+                            //DataTable productos = db.ResultQuery("SELECT *,GET_NOPLANO(idart) as noplano FROM tblremisiones_art where idrem=" + idRemision);
+                            DataTable productos = await utileria.getProductos(folio, documentoRest.codigo_cliente, documentoRest.documento_id, documentoRest.moneda_codigo);
+                            if(productos.Rows.Count == 0)
+                            {
+                                continue;
+                            }
+
                             if (!this.dev)
                             {
                                 // -- obtencion del folio de contpaq
@@ -109,22 +117,19 @@ namespace ImportadorRemisiones
 
                                     return;
                                 }
-                            }
 
-                            // -- definición del documento
-                            documento.aSerie = lSerieDocto.ToString();
-                            documento.aFolio = lFolioDocto;
-                            documento.aNumMoneda = documentoRest.moneda_codigo;
-                            documento.aTipoCambio = Convert.ToDouble(txtTipoCambio.Text);
-                            documento.aCodConcepto = documentoRest.factura_codigo.ToString();
-                            documento.aSistemaOrigen = 6;
-                            documento.aFecha = DateTime.Now.ToString("MM/dd/yyyy");
-                            // documento.aCodigoCteProv = idcl > 0 ?  nocliente.PadLeft(4, '0') : "999";
-                            //aqui asignamos el codigo de cliente proveedor
-                            documento.aCodigoCteProv = documentoRest.codigo_cliente;
+                                // -- definición del documento
+                                documento.aSerie = lSerieDocto.ToString();
+                                documento.aFolio = lFolioDocto;
+                                documento.aNumMoneda = documentoRest.moneda_codigo;
+                                documento.aTipoCambio = Convert.ToDouble(txtTipoCambio.Text);
+                                documento.aCodConcepto = documentoRest.factura_codigo.ToString();
+                                documento.aSistemaOrigen = 6;
+                                documento.aFecha = DateTime.Now.ToString("MM/dd/yyyy");
+                                // documento.aCodigoCteProv = idcl > 0 ?  nocliente.PadLeft(4, '0') : "999";
+                                //aqui asignamos el codigo de cliente proveedor
+                                documento.aCodigoCteProv = documentoRest.codigo_cliente;
 
-                            if (!this.dev)
-                            {
                                 // -- creando el documento
                                 lError = ComercialSdk.fAltaDocumento(ref aIdDocumento, ref documento);
                                 if (lError != 0)
@@ -169,45 +174,40 @@ namespace ImportadorRemisiones
                             }
 
                             //  Alta de los Movimientos
-                            //DataTable productos = db.ResultQuery("SELECT *,GET_NOPLANO(idart) as noplano FROM tblremisiones_art where idrem=" + idRemision);
-                            DataTable productos = await utileria.getProductos(folio,documentoRest.codigo_cliente,documentoRest.documento_id,documentoRest.moneda_codigo);
 
-                            if (productos != null)
+                            if (productos != null && productos.Rows.Count > 0)
                             {
-                                if (productos.Rows.Count > 0)
+                                foreach (DataRow row in productos.Rows)
                                 {
-                                    foreach (DataRow row in productos.Rows)
-                                    {
-                                        //necesito actualizar el servidor para mandar aprecio
-                                        double precioArticulo = double.Parse(row["aprecio"].ToString());
-                                        double precioTruncado = 0;
-                                        // buscar el articulo
-                                        string codArticulo = row["CCODIGOPRODUCTO"].ToString();
+                                    //necesito actualizar el servidor para mandar aprecio
+                                    double precioArticulo = double.Parse(row["aprecio"].ToString());
+                                    double precioTruncado = 0;
+                                    // buscar el articulo
+                                    string codArticulo = row["CCODIGOPRODUCTO"].ToString();
 
-                                        if (precioArticulo > 0)
+                                    if (precioArticulo > 0)
+                                    {
+                                        precioTruncado = Math.Truncate(precioArticulo * 100) / 100;
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show("Error: El precio del articulo es 0.0: " + codArticulo);
+
+                                        return;
+                                    }
+
+                                    if (!this.dev)
+                                    {
+                                        lError = 0;
+                                        lError = ComercialSdk.fBuscaProducto(codArticulo);
+                                        if (lError != 0)
                                         {
-                                            precioTruncado = Math.Truncate(precioArticulo * 100) / 100;
-                                        }
-                                        else
-                                        {
-                                            MessageBox.Show("Error: El precio del articulo es 0.0: " + codArticulo);
+                                            ComercialSdk.fError(lError, aMensaje, Constantes.kLongMensaje);
+                                            MessageBox.Show(aMensaje.ToString());
+                                            //frmEspera.Close();
+                                            MessageBox.Show("No se encontro el articulo: " + codArticulo);
 
                                             return;
-                                        }
-
-                                        if (this.dev)
-                                        {
-                                            lError = 0;
-                                            lError = ComercialSdk.fBuscaProducto(codArticulo);
-                                            if (lError != 0)
-                                            {
-                                                ComercialSdk.fError(lError, aMensaje, Constantes.kLongMensaje);
-                                                MessageBox.Show(aMensaje.ToString());
-                                                //frmEspera.Close();
-                                                MessageBox.Show("No se encontro el articulo: " + codArticulo);
-
-                                                return;
-                                            }
                                         }
 
                                         // -- unidades
@@ -230,7 +230,7 @@ namespace ImportadorRemisiones
                                         if (lError != 0)
                                         {
                                             ComercialSdk.fError(lError, aMensaje, Constantes.kLongMensaje);
-                                            MessageBox.Show("fAltaMoviemiento - Error: " + aMensaje.ToString() + " producto:" + row["CCODIGOPRODUCTO"].ToString() );
+                                            MessageBox.Show("fAltaMoviemiento - Error: " + aMensaje.ToString() + " producto:" + row["CCODIGOPRODUCTO"].ToString());
                                             //frmEspera.Close();
 
                                             return;
@@ -251,22 +251,27 @@ namespace ImportadorRemisiones
 
                                         double iva_percent = double.Parse(row["aimpuesto"].ToString()) / 100;
                                         double iva_total = precioArticulo * iva_percent;
-                                        lError = ComercialSdk.fSetDatoMovimiento("CIMPUESTO1", iva_total.ToString());
+                                        lError = ComercialSdk.fSetDatoMovimiento("CPORCENTAJEIMPUESTO1", (iva_percent * 100).ToString());
+                                        //lError = ComercialSdk.fSetDatoMovimiento("CIMPUESTO1", (iva_total*100).ToString());
                                         //lError = ComercialSdk.fSetDatoMovimiento("CPORCENTAJEIMPUESTO1", iva_percent.ToString());
 
                                         double ieps_percent = double.Parse(row["aieps"].ToString()) / 100;
                                         double ieps_total = precioArticulo * ieps_percent;
-                                        lError = ComercialSdk.fSetDatoMovimiento("CIMPUESTO2", ieps_total.ToString());
+
+                                        lError = ComercialSdk.fSetDatoMovimiento("CPORCENTAJEIMPUESTO2", (ieps_percent * 100).ToString());
+                                        //lError = ComercialSdk.fSetDatoMovimiento("CIMPUESTO2", (ieps_total*100).ToString());
+
+                                        //lError = ComercialSdk.fSetDatoMovimiento("CPORCENTAJEIMPUESTO3", ieps_percent.ToString());
                                         //lError = ComercialSdk.fSetDatoMovimiento("CPORCENTAJEIMPUESTO2", ieps_percent.ToString());
 
                                         double neto = precioArticulo * unidades;
 
                                         //lError= ComercialSdk.fSetDatoMovimiento("CIDUNIDAD", row["CIDUNIDAD"].ToString());
 
-                                        lError = ComercialSdk.fSetDatoMovimiento("CNETO", neto.ToString());
+                                        //lError = ComercialSdk.fSetDatoMovimiento("CNETO", neto.ToString());
 
                                         double total = neto + iva_total + ieps_total;
-                                        lError = ComercialSdk.fSetDatoMovimiento("CTOTAL", total.ToString());
+                                        //lError = ComercialSdk.fSetDatoMovimiento("CTOTAL", total.ToString());
 
                                         lError = ComercialSdk.fGuardaMovimiento();
 
@@ -278,26 +283,14 @@ namespace ImportadorRemisiones
 
                                             return;
                                         }
-
-                                        // Bandera de Factura Importada
-                                        //string json = JsonConvert.SerializeObject(row);
-                                        //recordatorio, hacer funcion para marcar la orden como importada es decir oestatus=2
-                                        //await utileria.marcarProductoImportado(json);
                                     }
-                                    List<object> listaObjetos = ConvertirDataTableALista(productos);
 
-                                    // Convierte la lista de objetos a formato JSON
-                                    //string json = JsonConvert.SerializeObject(listaObjetos);
-
+                                    object rowObjeto = ConvertirDataRowADynamic(row);
                                     // Bandera de Factura Importada
+                                    string json = JsonConvert.SerializeObject(rowObjeto);
                                     //recordatorio, hacer funcion para marcar la orden como importada es decir oestatus=2
-                                    //await utileria.marcarProductosImportados(json);
-                                }
-                                else
-                                {
-                                    //MessageBox.Show("La lista de productos esta vacia");
-                                    //return;
-                                }
+                                    await utileria.marcarProductoImportado(json);
+                                } // FIN FOR EACH PRODUCTO
                             }
                             else
                             {
@@ -336,6 +329,21 @@ namespace ImportadorRemisiones
                 frmEspera.Close();
                 MessageBox.Show($"Excepcion en Main: {ex.Message}");
             }
+        }
+        static dynamic ConvertirDataRowADynamic(DataRow row)
+        {
+            if (row == null)
+                throw new ArgumentNullException(nameof(row), "El DataRow no puede ser nulo.");
+
+            dynamic dynamicObject = new ExpandoObject();
+            var dictionary = (IDictionary<string, object>)dynamicObject;
+
+            foreach (DataColumn column in row.Table.Columns)
+            {
+                dictionary[column.ColumnName] = row[column.ColumnName];
+            }
+
+            return dynamicObject;
         }
         static List<object> ConvertirDataTableALista(DataTable dataTable)
         {
