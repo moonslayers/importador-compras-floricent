@@ -199,6 +199,7 @@
     <Compile Include="TipoFactura.cs" />
     <Compile Include="Utileria.cs" />
     <Compile Include="UtilsDb.cs" />
+    <Compile Include="WebServer.cs" />
     <EmbeddedResource Include="frmEspera.resx">
       <DependentUpon>frmEspera.cs</DependentUpon>
     </EmbeddedResource>

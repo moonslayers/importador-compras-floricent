@@ -10,6 +10,9 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Dynamic;
 
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+
 namespace ImportadorRemisiones
 {
     public partial class Importador : Form
@@ -547,6 +550,20 @@ namespace ImportadorRemisiones
             {
                 row.Selected = true;
             }
+        }
+
+                public Task ProcesarFacturaDesdeApi(string json)
+        {
+            try
+            {
+                // For testing, we'll just show the received JSON in a message box.
+                MessageBox.Show("JSON Recibido:\n\n" + json, "Datos Recibidos desde API", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al procesar el JSON: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return Task.CompletedTask;
         }
     }
 }

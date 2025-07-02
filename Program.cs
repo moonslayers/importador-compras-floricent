@@ -16,7 +16,16 @@ namespace ImportadorRemisiones
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Importador());
+                        var importador = new Importador();
+            var webServer = new WebServer("http://localhost:5000/", async (json) =>
+            {
+                await importador.ProcesarFacturaDesdeApi(json);
+            });
+            webServer.Start();
+
+            Application.Run(importador);
+
+            webServer.Stop();
         }
     }
 }
