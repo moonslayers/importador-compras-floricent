@@ -48,8 +48,21 @@ namespace ImportadorRemisiones
             this.tsBtnTipoCambio = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.button1 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvRemisiones)).BeginInit();
+            this.btnGetInvoices = new System.Windows.Forms.Button();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.dgvInvoices = new System.Windows.Forms.DataGridView();
+            this.InvoiceFolio = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.InvoiceFecha = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.InvoiceCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.InvoiceOrden = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.InvoiceShipDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolStripMain.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvRemisiones)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvInvoices)).BeginInit();
             this.SuspendLayout();
             // 
             // btnVerRemisiones
@@ -61,6 +74,16 @@ namespace ImportadorRemisiones
             this.btnVerRemisiones.Text = "Ver Ordenes";
             this.btnVerRemisiones.UseVisualStyleBackColor = true;
             this.btnVerRemisiones.Click += new System.EventHandler(this.btnVerRemisiones_ClickAsync);
+            //
+            // btnGetInvoices
+            //
+            this.btnGetInvoices.Location = new System.Drawing.Point(400, 52);
+            this.btnGetInvoices.Name = "btnGetInvoices";
+            this.btnGetInvoices.Size = new System.Drawing.Size(138, 35);
+            this.btnGetInvoices.TabIndex = 9;
+            this.btnGetInvoices.Text = "Ver Facturas";
+            this.btnGetInvoices.UseVisualStyleBackColor = true;
+            this.btnGetInvoices.Click += new System.EventHandler(this.btnGetInvoices_Click);
             // 
             // btnImportarContpaqi
             // 
@@ -76,8 +99,8 @@ namespace ImportadorRemisiones
             // 
             this.dgvRemisiones.AllowUserToAddRows = false;
             this.dgvRemisiones.AllowUserToDeleteRows = false;
-            this.dgvRemisiones.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.dgvRemisiones.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
@@ -93,12 +116,13 @@ namespace ImportadorRemisiones
             this.nocliente,
             this.RID,
             this.aproveedor});
-            this.dgvRemisiones.Location = new System.Drawing.Point(12, 101);
+            this.dgvRemisiones.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvRemisiones.Location = new System.Drawing.Point(3, 3);
             this.dgvRemisiones.Name = "dgvRemisiones";
             this.dgvRemisiones.ReadOnly = true;
             this.dgvRemisiones.RowHeadersWidth = 82;
             this.dgvRemisiones.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvRemisiones.Size = new System.Drawing.Size(776, 417);
+            this.dgvRemisiones.Size = new System.Drawing.Size(762, 385);
             this.dgvRemisiones.TabIndex = 2;
             // 
             // Folio
@@ -211,17 +235,104 @@ namespace ImportadorRemisiones
             this.button1.Text = "Seleccionar todo";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.select_all);
-            // 
+            
+            //
+            // tabControl1
+            //
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Location = new System.Drawing.Point(12, 93);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(776, 425);
+            this.tabControl1.TabIndex = 10;
+            //
+            // tabPage1
+            //
+            this.tabPage1.Controls.Add(this.dgvRemisiones);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(768, 399);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Ordenes";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            //
+            // tabPage2
+            //
+            this.tabPage2.Controls.Add(this.dgvInvoices);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(768, 399);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Facturas";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            //
+            // dgvInvoices
+            //
+            this.dgvInvoices.AllowUserToAddRows = false;
+            this.dgvInvoices.AllowUserToDeleteRows = false;
+            this.dgvInvoices.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvInvoices.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+                this.InvoiceFolio,
+                this.InvoiceFecha,
+                this.InvoiceCliente,
+                this.InvoiceOrden,
+                this.InvoiceShipDate});
+            this.dgvInvoices.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvInvoices.Location = new System.Drawing.Point(3, 3);
+            this.dgvInvoices.Name = "dgvInvoices";
+            this.dgvInvoices.ReadOnly = true;
+            this.dgvInvoices.Size = new System.Drawing.Size(762, 393);
+            this.dgvInvoices.TabIndex = 0;
+            //
+            // InvoiceFolio
+            //
+            this.InvoiceFolio.DataPropertyName = "folio";
+            this.InvoiceFolio.HeaderText = "Folio";
+            this.InvoiceFolio.Name = "InvoiceFolio";
+            this.InvoiceFolio.ReadOnly = true;
+            //
+            // InvoiceFecha
+            //
+            this.InvoiceFecha.DataPropertyName = "fecha";
+            this.InvoiceFecha.HeaderText = "Fecha";
+            this.InvoiceFecha.Name = "InvoiceFecha";
+            this.InvoiceFecha.ReadOnly = true;
+            //
+            // InvoiceCliente
+            //
+            this.InvoiceCliente.DataPropertyName = "cliente_codigo";
+            this.InvoiceCliente.HeaderText = "Cliente";
+            this.InvoiceCliente.Name = "InvoiceCliente";
+            this.InvoiceCliente.ReadOnly = true;
+            //
+            // InvoiceOrden
+            //
+            this.InvoiceOrden.DataPropertyName = "orden";
+            this.InvoiceOrden.HeaderText = "Orden";
+            this.InvoiceOrden.Name = "InvoiceOrden";
+            this.InvoiceOrden.ReadOnly = true;
+            //
+            // InvoiceShipDate
+            //
+            this.InvoiceShipDate.DataPropertyName = "shipDate";
+            this.InvoiceShipDate.HeaderText = "Fecha de Envio";
+            this.InvoiceShipDate.Name = "InvoiceShipDate";
+            this.InvoiceShipDate.ReadOnly = true;
+            //
             // Importador
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 530);
+            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.btnGetInvoices);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.toolStripMain);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtTipoCambio);
-            this.Controls.Add(this.dgvRemisiones);
             this.Controls.Add(this.btnImportarContpaqi);
             this.Controls.Add(this.btnVerRemisiones);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -229,9 +340,13 @@ namespace ImportadorRemisiones
             this.Text = "IMPORTADOR DE ORDENES DE COMPRA v2024.1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Importador_FormClosing);
             this.Load += new System.EventHandler(this.Importador_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dgvRemisiones)).EndInit();
             this.toolStripMain.ResumeLayout(false);
             this.toolStripMain.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvRemisiones)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvInvoices)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -256,6 +371,17 @@ namespace ImportadorRemisiones
         private System.Windows.Forms.DataGridViewTextBoxColumn nocliente;
         private System.Windows.Forms.DataGridViewTextBoxColumn RID;
         private System.Windows.Forms.DataGridViewTextBoxColumn aproveedor;
+        private System.Windows.Forms.Button btnGetInvoices;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.DataGridView dgvInvoices;
+        private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceFolio;
+        private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceFecha;
+        private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceCliente;
+        private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceOrden;
+        private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceShipDate;
     }
-}
 
+
+}

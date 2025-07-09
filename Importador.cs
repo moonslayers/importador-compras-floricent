@@ -9,6 +9,7 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.IO;
 using System.Dynamic;
+using System.Security.Policy;
 
 namespace ImportadorRemisiones
 {
@@ -97,7 +98,7 @@ namespace ImportadorRemisiones
                         {
                             //DataTable productos = db.ResultQuery("SELECT *,GET_NOPLANO(idart) as noplano FROM tblremisiones_art where idrem=" + idRemision);
                             DataTable productos = await utileria.getProductos(folio, documentoRest.codigo_cliente, documentoRest.documento_id, documentoRest.moneda_codigo);
-                            if(productos.Rows.Count == 0)
+                            if (productos.Rows.Count == 0)
                             {
                                 continue;
                             }
@@ -369,7 +370,8 @@ namespace ImportadorRemisiones
             while (reader.Read())
             {
                 //Console.WriteLine("TokenType: {0}, Value: {1}", reader.TokenType, reader.Value);
-                if(reader.Value != null) {
+                if (reader.Value != null)
+                {
                     if (reader.Value.ToString() == key)
                     {
                         reader.Read();
@@ -388,7 +390,7 @@ namespace ImportadorRemisiones
             }
             return "";
         }
-        
+
 
         private void Importador_Load(object sender, EventArgs e)
         {
@@ -547,6 +549,113 @@ namespace ImportadorRemisiones
             {
                 row.Selected = true;
             }
+
         }
+
+        private async void btnGetInvoices_Click(object sender, EventArgs e)
+        {
+            frmEspera esperaFrm = new frmEspera();
+            esperaFrm.Show();
+
+            try
+            {
+                string apiUrl = string.Format(ConfigurationManager.AppSettings["APIPOSCO"]);
+
+                using (HttpClient client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+
+                        // Deserializar con la clase contenedora
+                        RespuestaFacturas respuesta = JsonConvert.DeserializeObject<RespuestaFacturas>(apiResponse);
+                        List<FacturaContpaqi> facturas = respuesta.facturas;
+
+                        // Declarar e inicializar la lista de datos
+                        List<FacturaResumen> resumenFacturas = new List<FacturaResumen>();
+
+                        foreach (var factura in facturas)
+                        {
+                            if (factura.datos != null)
+                            {
+                                resumenFacturas.Add(new FacturaResumen
+                                {
+                                    folio = factura.datos.folio,
+                                    fecha = factura.datos.fecha,
+                                    cliente_codigo = factura.datos.cliente_codigo,
+                                    orden = factura.datos.orden.ToString(),
+                                    shipDate = factura.datos.shipDate
+                                });
+                            }
+                        }
+                        dgvInvoices.DataSource = resumenFacturas;
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("Error en la solicitud al API. Código de estado: " + response.StatusCode);
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show("Error: " + error.Message);
+            }
+            finally
+            {
+                esperaFrm.Close();
+            }
+        }
+
+
+        public class FacturaContpaqi
+        {
+            public Datos datos { get; set; }
+            public List<Concepto> conceptos { get; set; }
+        }
+
+        public class Datos
+        {
+            public string folio { get; set; }
+            public string fecha { get; set; }
+            public string cliente_codigo { get; set; }
+            public int moneda_codigo { get; set; }
+            public int tipo_cambio { get; set; }
+            public string concepto_codigo { get; set; }
+            public int id_envio { get; set; }
+            public int id_parada { get; set; }
+            public int orden { get; set; }
+            public string shipDate { get; set; }
+
+        }
+
+        public class Concepto
+        {
+            public string codigo { get; set; }
+            public int cantidad { get; set; }
+            public double precio { get; set; }
+            public int iva { get; set; }
+            public string almacen { get; set; }
+            public double importe { get; set; }
+        }
+
+        public class RespuestaFacturas
+        {
+            public List<FacturaContpaqi> facturas { get; set; }
+        }
+
+
+
+    }
+
+    public class FacturaResumen
+    {
+        public string folio { get; set; }
+        public string fecha { get; set; }
+        public string cliente_codigo { get; set; }
+        public string orden { get; set; }
+        public string shipDate { get; set; }
     }
 }
