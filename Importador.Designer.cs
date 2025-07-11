@@ -95,6 +95,17 @@ namespace ImportadorRemisiones
             this.btnImportarContpaqi.UseVisualStyleBackColor = true;
             this.btnImportarContpaqi.Click += new System.EventHandler(this.btnImportarContpaqi_ClickAsync);
             // 
+            // btnExportarFacturasContpaqi
+            // 
+            this.btnExportarFacturasContpaqi = new System.Windows.Forms.Button();
+            this.btnExportarFacturasContpaqi.Location = new System.Drawing.Point(659, 480); // Ajusta según tu layout
+            this.btnExportarFacturasContpaqi.Name = "btnExportarFacturasContpaqi";
+            this.btnExportarFacturasContpaqi.Size = new System.Drawing.Size(129, 35);
+            this.btnExportarFacturasContpaqi.TabIndex = 11;
+            this.btnExportarFacturasContpaqi.Text = "Exportar Facturas";
+            this.btnExportarFacturasContpaqi.UseVisualStyleBackColor = true;
+            this.btnExportarFacturasContpaqi.Click += new System.EventHandler(this.btnExportarFacturasContpaqi_Click);
+            // 
             // dgvRemisiones
             // 
             this.dgvRemisiones.AllowUserToAddRows = false;
@@ -334,6 +345,7 @@ namespace ImportadorRemisiones
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtTipoCambio);
             this.Controls.Add(this.btnImportarContpaqi);
+            this.Controls.Add(this.btnExportarFacturasContpaqi);
             this.Controls.Add(this.btnVerRemisiones);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Importador";
@@ -381,6 +393,8 @@ namespace ImportadorRemisiones
         private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceCliente;
         private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceOrden;
         private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceShipDate;
+        private System.Windows.Forms.Button btnExportarFacturasContpaqi;
+
     }
 
 

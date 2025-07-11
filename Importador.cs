@@ -610,6 +610,106 @@ namespace ImportadorRemisiones
             }
         }
 
+public async Task ExportarFacturaAContpaqi(FacturaContpaqi factura)
+{
+    frmEspera frmEspera = new frmEspera();
+    frmEspera.Show();
+
+    try
+    {
+        Utileria utileria = new Utileria();
+        tDocumento documento = new tDocumento();
+        tMovimiento movimiento = new tMovimiento();
+        int aIdDocumento = 0;
+        int aIdMovimiento = 0;
+        double lFolioDocto = 0;
+
+        StringBuilder lSerieDocto = new StringBuilder(12);
+        StringBuilder aMensaje = new StringBuilder(512);
+
+        // Obtener siguiente folio
+        int lError = ComercialSdk.fSiguienteFolio("FACT", lSerieDocto, ref lFolioDocto);
+        if (lError != 0)
+        {
+            ComercialSdk.fError(lError, aMensaje, 512);
+            MessageBox.Show("fSiguienteFolio - Error: " + aMensaje);
+            frmEspera.Close();
+            return;
+        }
+
+        // Crear documento
+        documento.aSerie = lSerieDocto.ToString();
+        documento.aFolio = lFolioDocto;
+        documento.aNumMoneda = factura.moneda_codigo;
+        documento.aTipoCambio = Convert.ToDouble(txtTipoCambio.Text);
+        documento.aCodConcepto = "FACT"; // usa el concepto correcto según tu configuración
+        documento.aSistemaOrigen = 6;
+        documento.aFecha = DateTime.Now.ToString("MM/dd/yyyy");
+        documento.aCodigoCteProv = factura.codigo_cliente;
+
+        lError = ComercialSdk.fAltaDocumento(ref aIdDocumento, ref documento);
+        if (lError != 0)
+        {
+            ComercialSdk.fError(lError, aMensaje, 512);
+            MessageBox.Show("fAltaDocumento - Error: " + aMensaje);
+            frmEspera.Close();
+            return;
+        }
+
+        ComercialSdk.fBuscarIdDocumento(aIdDocumento);
+        ComercialSdk.fSetDatoDocumento("Ctextoex01", $"OC-{factura.orden}");
+        ComercialSdk.fSetDatoDocumento("Clugarexpe", factura.cliente_direccion);
+        ComercialSdk.fSetDatoDocumento("CFECHAVENCIMIENTO", DateTime.Now.AddDays(30).ToString("MM/dd/yyyy"));
+
+        ComercialSdk.fGuardaDocumento();
+
+        // Insertar productos
+        foreach (var prod in factura.productos)
+        {
+            lError = ComercialSdk.fBuscaProducto(prod.codigo_contpaqi);
+            if (lError != 0)
+            {
+                ComercialSdk.fError(lError, aMensaje, Constantes.kLongMensaje);
+                MessageBox.Show("Producto no encontrado: " + prod.codigo_contpaqi + "\n" + aMensaje);
+                continue;
+            }
+
+            movimiento.aConsecutivo = 1;
+            movimiento.aUnidades = prod.cantidad;
+            movimiento.aPrecio = prod.precio;
+            movimiento.aCodProdSer = prod.codigo_contpaqi;
+            movimiento.aCodAlmacen = prod.almacen;
+
+            lError = ComercialSdk.fAltaMovimiento(aIdDocumento, ref aIdMovimiento, ref movimiento);
+            if (lError != 0)
+            {
+                ComercialSdk.fError(lError, aMensaje, Constantes.kLongMensaje);
+                MessageBox.Show("fAltaMovimiento - Error: " + aMensaje);
+                continue;
+            }
+
+            ComercialSdk.fBuscarIdMovimiento(aIdMovimiento);
+            ComercialSdk.fSetDatoMovimiento("CPORCENTAJEIMPUESTO1", prod.iva.ToString());
+            ComercialSdk.fGuardaMovimiento();
+        }
+
+        MessageBox.Show($"Factura {factura.folio} registrada correctamente.");
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("Error al exportar factura: " + ex.Message);
+    }
+    finally
+    {
+        frmEspera.Close();
+    }
+}
+
+private void btnExportarFacturasContpaqi_Click(object sender, EventArgs e)
+{
+    ExportarFacturasContpaqi(); // Asegúrate de tener esta función implementada
+}
+
 
         public class FacturaContpaqi
         {
