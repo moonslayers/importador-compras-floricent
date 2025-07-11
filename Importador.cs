@@ -578,19 +578,20 @@ namespace ImportadorRemisiones
 
                         foreach (var factura in facturas)
                         {
-                            if (factura.datos != null)
+                            resumenFacturas.Add(new FacturaResumen
                             {
-                                resumenFacturas.Add(new FacturaResumen
-                                {
-                                    folio = factura.datos.folio,
-                                    fecha = factura.datos.fecha,
-                                    cliente_codigo = factura.datos.cliente_codigo,
-                                    orden = factura.datos.orden.ToString(),
-                                    shipDate = factura.datos.shipDate
-                                });
-                            }
+                                folio = factura.folio,
+                                //fecha = factura.fecha,
+                                codigo_cliente_PO = factura.codigo_cliente_PO,
+                                orden = factura.orden,
+                                ship_date = factura.ship_date
+                            });
                         }
+
+
+                        dgvInvoices.AutoGenerateColumns = true;
                         dgvInvoices.DataSource = resumenFacturas;
+
 
                     }
                     else
@@ -612,23 +613,15 @@ namespace ImportadorRemisiones
 
         public class FacturaContpaqi
         {
-            public Datos datos { get; set; }
-            public List<Concepto> conceptos { get; set; }
-        }
-
-        public class Datos
-        {
             public string folio { get; set; }
-            public string fecha { get; set; }
-            public string cliente_codigo { get; set; }
+            public string codigo_cliente_PO { get; set; }
             public int moneda_codigo { get; set; }
-            public int tipo_cambio { get; set; }
-            public string concepto_codigo { get; set; }
             public int id_envio { get; set; }
             public int id_parada { get; set; }
-            public int orden { get; set; }
-            public string shipDate { get; set; }
+            public string orden { get; set; }
+            public string ship_date { get; set; }
 
+            public List<Concepto> productos { get; set; }
         }
 
         public class Concepto
@@ -637,7 +630,6 @@ namespace ImportadorRemisiones
             public int cantidad { get; set; }
             public double precio { get; set; }
             public int iva { get; set; }
-            public string almacen { get; set; }
             public double importe { get; set; }
         }
 
@@ -647,15 +639,17 @@ namespace ImportadorRemisiones
         }
 
 
+        public class FacturaResumen
+        {
+            public string folio { get; set; }
+            public string codigo_cliente_PO { get; set; }
+            public string orden { get; set; }
+
+            [JsonProperty("ship_date")]
+            public string ship_date { get; set; }
+        }
+
 
     }
 
-    public class FacturaResumen
-    {
-        public string folio { get; set; }
-        public string fecha { get; set; }
-        public string cliente_codigo { get; set; }
-        public string orden { get; set; }
-        public string shipDate { get; set; }
-    }
 }

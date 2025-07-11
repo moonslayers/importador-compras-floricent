@@ -54,7 +54,7 @@ namespace ImportadorRemisiones
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.dgvInvoices = new System.Windows.Forms.DataGridView();
             this.InvoiceFolio = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.InvoiceFecha = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            //this.InvoiceFecha = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.InvoiceCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.InvoiceOrden = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.InvoiceShipDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -276,7 +276,7 @@ namespace ImportadorRemisiones
             this.dgvInvoices.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvInvoices.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
                 this.InvoiceFolio,
-                this.InvoiceFecha,
+                //this.InvoiceFecha,
                 this.InvoiceCliente,
                 this.InvoiceOrden,
                 this.InvoiceShipDate});
@@ -296,14 +296,14 @@ namespace ImportadorRemisiones
             //
             // InvoiceFecha
             //
-            this.InvoiceFecha.DataPropertyName = "fecha";
-            this.InvoiceFecha.HeaderText = "Fecha";
-            this.InvoiceFecha.Name = "InvoiceFecha";
-            this.InvoiceFecha.ReadOnly = true;
+            //this.InvoiceFecha.DataPropertyName = "fecha";
+            //this.InvoiceFecha.HeaderText = "Fecha";
+            //this.InvoiceFecha.Name = "InvoiceFecha";
+            //this.InvoiceFecha.ReadOnly = true;
             //
             // InvoiceCliente
             //
-            this.InvoiceCliente.DataPropertyName = "cliente_codigo";
+            this.InvoiceCliente.DataPropertyName = "codigo_cliente_PO";
             this.InvoiceCliente.HeaderText = "Cliente";
             this.InvoiceCliente.Name = "InvoiceCliente";
             this.InvoiceCliente.ReadOnly = true;
@@ -377,7 +377,7 @@ namespace ImportadorRemisiones
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.DataGridView dgvInvoices;
         private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceFolio;
-        private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceFecha;
+        //private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceFecha;
         private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceCliente;
         private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceOrden;
         private System.Windows.Forms.DataGridViewTextBoxColumn InvoiceShipDate;
