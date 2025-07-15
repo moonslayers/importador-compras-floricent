@@ -678,7 +678,6 @@ public async Task ExportarFacturaAContpaqi(FacturaContpaqi factura)
             movimiento.aUnidades = prod.cantidad;
             movimiento.aPrecio = prod.precio;
             movimiento.aCodProdSer = prod.codigo_contpaqi;
-            movimiento.aCodAlmacen = prod.almacen;
 
             lError = ComercialSdk.fAltaMovimiento(aIdDocumento, ref aIdMovimiento, ref movimiento);
             if (lError != 0)
